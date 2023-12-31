@@ -1,0 +1,230 @@
+<<< CREATING CUSTOM TEST DATABASE >>>
+
+mysql> CREATE TABLE EMPLOYEES (
+       EMPLOYEE_ID INT PRIMARY KEY,
+       FIRST_NAME VARCHAR(50),
+       LAST_NAME VARCHAR(50),
+       HIRE_DATE DATE,
+       JOB_ID VARCHAR(10),
+       SALARY INT,
+       DEPARTMENT_ID INT
+     );
+
+mysql> CREATE TABLE JOBS (
+       JOB_ID VARCHAR(10) PRIMARY KEY,
+       JOB_TITLE VARCHAR(50),
+       MIN_SALARY INT
+     );
+
+mysql> CREATE TABLE DEPARTMENTS (
+       DEPARTMENT_ID INT PRIMARY KEY,
+       DEPARTMENT_NAME VARCHAR(50)
+     );
+
+mysql> CREATE TABLE JOB_HISTORY (
+       EMPLOYEE_ID INT,
+       START_DATE DATE,
+       END_DATE DATE,
+       JOB_ID VARCHAR(10),
+       DEPARTMENT_ID INT
+     );
+
+mysql> INSERT INTO EMPLOYEES (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, HIRE_DATE, JOB_ID, SALARY, DEPARTMENT_ID)
+     VALUES
+       (100, 'ISMAEL', 'ISMAEL', '2020-01-01', 'IT_PROG', 9000, 60),
+       (101, 'JOHN', 'DOE', '2021-05-15', 'SA_REP', 15000, 80),
+       (102, 'JANE', 'SMITH', '2019-12-03', 'MANAGER', 25000, 90),
+       (103, 'MICHAEL', 'WANG', '2022-08-20', 'CLERK', 5000, 50),
+       (104, 'ASHLEY', 'JONES', '2020-11-12', 'ANALYST', 12000, 60);
+
+mysql> INSERT INTO JOBS (JOB_ID, JOB_TITLE, MIN_SALARY)
+     VALUES
+       ('IT_PROG', 'Programmer', 4000),
+       ('SA_REP', 'Sales Representative', 6000),
+       ('MANAGER', 'Manager', 8000),
+       ('CLERK', 'Clerk', 2500),
+       ('ANALYST', 'Analyst', 6000);
+
+mysql> INSERT INTO DEPARTMENTS (DEPARTMENT_ID, DEPARTMENT_NAME)
+     VALUES
+       (50, 'SALES'),
+       (60, 'IT'),
+       (80, 'MARKETING'),
+       (90, 'ACCOUNTING');
+
+mysql> INSERT INTO JOB_HISTORY (EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID)
+     VALUES
+       (104, '2020-09-20', '2020-11-11', 'CLERK', 50),
+       (102, '2015-01-01', '2019-11-30', 'ANALYST', 60),
+       (103, '2022-06-01', '2022-08-19', 'IT_PROG', 60);
+
+mysql> select * from JOB_HISTORY;
++-------------+------------+------------+---------+---------------+
+| EMPLOYEE_ID | START_DATE | END_DATE   | JOB_ID  | DEPARTMENT_ID |
++-------------+------------+------------+---------+---------------+
+|         104 | 2020-09-20 | 2020-11-11 | CLERK   |            50 |
+|         102 | 2015-01-01 | 2019-11-30 | ANALYST |            60 |
+|         103 | 2022-06-01 | 2022-08-19 | IT_PROG |            60 |
++-------------+------------+------------+---------+---------------+
+
+mysql> select * from DEPARTMENTS;
++---------------+-----------------+
+| DEPARTMENT_ID | DEPARTMENT_NAME |
++---------------+-----------------+
+|            50 | SALES           |
+|            60 | IT              |
+|            80 | MARKETING       |
+|            90 | ACCOUNTING      |
++---------------+-----------------+
+
+mysql> select * from JOBS;
++---------+----------------------+------------+
+| JOB_ID  | JOB_TITLE            | MIN_SALARY |
++---------+----------------------+------------+
+| ANALYST | Analyst              |       6000 |
+| CLERK   | Clerk                |       2500 |
+| IT_PROG | Programmer           |       4000 |
+| MANAGER | Manager              |       8000 |
+| SA_REP  | Sales Representative |       6000 |
++---------+----------------------+------------+
+
+mysql> select * from EMPLOYEES;
++-------------+------------+-----------+------------+---------+--------+---------------+
+| EMPLOYEE_ID | FIRST_NAME | LAST_NAME | HIRE_DATE  | JOB_ID  | SALARY | DEPARTMENT_ID |
++-------------+------------+-----------+------------+---------+--------+---------------+
+|         100 | ISMAEL     | ISMAEL    | 2020-01-01 | IT_PROG |   9000 |            60 |
+|         101 | JOHN       | DOE       | 2021-05-15 | SA_REP  |  15000 |            80 |
+|         102 | JANE       | SMITH     | 2019-12-03 | MANAGER |  25000 |            90 |
+|         103 | MICHAEL    | WANG      | 2022-08-20 | CLERK   |   5000 |            50 |
+|         104 | ASHLEY     | JONES     | 2020-11-12 | ANALYST |  12000 |            60 |
++-------------+------------+-----------+------------+---------+--------+---------------+
+
+/////// ******** \\\\\\\\
+
+1. WRITE A QUERY TO FIND THE NAME (FIRST_NAME, LAST_NAME) AND HIRE DATE OF THE EMPLOYEES WHO WAS HIRED AFTER 'ISMAEL'.
+
+mysql> SELECT FIRST_NAME, LAST_NAME, HIRE_DATE
+     FROM EMPLOYEES
+     WHERE HIRE_DATE > (SELECT HIRE_DATE FROM EMPLOYEES WHERE FIRST_NAME = 'ISMAEL' AND LAST_NAME = 'ISMAEL');
++------------+-----------+------------+
+| FIRST_NAME | LAST_NAME | HIRE_DATE  |
++------------+-----------+------------+
+| JOHN       | DOE       | 2021-05-15 |
+| MICHAEL    | WANG      | 2022-08-20 |
+| ASHLEY     | JONES     | 2020-11-12 |
++------------+-----------+------------+
+
+
+2. WRITE A QUERY TO FIND THE EMPLOYEE ID, JOB TITLE, NUMBER OF DAYS BETWEEN ENDING DATE AND STARTING DATE FOR ALL JOBS IN DEPARTMENT 90 FROM JOB HISTORY.
+
+mysql> SELECT EMPLOYEE_ID, JOB_TITLE, DATEDIFF(END_DATE, START_DATE) AS DAYS_WORKED
+     FROM JOB_HISTORY
+     JOIN JOBS ON JOB_HISTORY.JOB_ID = JOBS.JOB_ID
+     WHERE DEPARTMENT_ID = 90;
+
+
+3. WRITE A QUERY TO DISPLAY JOB TITLE, EMPLOYEE NAME, AND THE DIFFERENCE BETWEEN SALARY OF THE EMPLOYEE AND MINIMUM SALARY FOR THE JOB. 
+
+mysql> SELECT j.JOB_TITLE, CONCAT(e.FIRST_NAME, ' ', e.LAST_NAME) AS EMPLOYEE_NAME, e.SALARY - j.MIN_SALARY AS SALARY_DIFFERENCE
+     FROM EMPLOYEES e
+     JOIN JOBS j ON e.JOB_ID = j.JOB_ID;
++----------------------+---------------+-------------------+
+| JOB_TITLE            | EMPLOYEE_NAME | SALARY_DIFFERENCE |
++----------------------+---------------+-------------------+
+| Programmer           | ISMAEL ISMAEL |              5000 |
+| Sales Representative | JOHN DOE      |              9000 |
+| Manager              | JANE SMITH    |             17000 |
+| Clerk                | MICHAEL WANG  |              2500 |
+| Analyst              | ASHLEY JONES  |              6000 |
++----------------------+---------------+-------------------+
+
+
+4. WRITE A QUERY TO DISPLAY DEPARTMENT NAME, NAME (FIRST_NAME, LAST_NAME), HIRE DATE, SALARY OF THE MANAGER FOR ALL MANAGERS WHOSE EXPERIENCE IS MORE THAN 15 YEARS
+
+mysql> SELECT d.DEPARTMENT_NAME, CONCAT(e.FIRST_NAME, ' ', e.LAST_NAME) AS MANAGER_NAME,
+     e.HIRE_DATE, e.SALARY
+     FROM EMPLOYEES e
+     JOIN DEPARTMENTS d ON e.DEPARTMENT_ID = d.DEPARTMENT_ID
+     WHERE e.JOB_ID = 'MANAGER'
+     AND DATEDIFF(CURRENT_DATE, e.HIRE_DATE) / 365 > 15;
+
+
+5. WRITE A STORE FUNCTION TO FIND THE TYPE OF CARD TO BE ALLOCATED TO THE EMPLOYEE BASED ON THE SALARY :- 
+• Salary between 1000 - 10000 (Silver Card With 50000 Limit) 
+• Salary between 10000 - 20000 (Gold Card With 150000 Limit) 
+• Salary greater then 20000 (Platinum Card with 300000 Limit) 
+
+mysql> DELIMITER &&
+mysql> CREATE FUNCTION ALLOCATE_CARD(salary INT)
+     RETURNS VARCHAR(50)
+     DETERMINISTIC
+     BEGIN
+       IF salary BETWEEN 1000 AND 10000 THEN
+         RETURN 'Silver Card (50000 Limit)';
+       ELSEIF salary BETWEEN 10000 AND 20000 THEN
+         RETURN 'Gold Card (150000 Limit)';
+       ELSE
+         RETURN 'Platinum Card (300000 Limit)';
+       END IF;
+     END &&
+
+mysql> DELIMITER ;
+
+///*** HOW TO CALL THIS FUNCTION
+mysql> SELECT e.EMPLOYEE_ID, e.FIRST_NAME, e.LAST_NAME, ALLOCATE_CARD(e.SALARY) AS CARD_TYPE
+     FROM EMPLOYEES e;
++-------------+------------+-----------+------------------------------+
+| EMPLOYEE_ID | FIRST_NAME | LAST_NAME | CARD_TYPE                    |
++-------------+------------+-----------+------------------------------+
+|         100 | ISMAEL     | ISMAEL    | Silver Card (50000 Limit)    |
+|         101 | JOHN       | DOE       | Gold Card (150000 Limit)     |
+|         102 | JANE       | SMITH     | Platinum Card (300000 Limit) |
+|         103 | MICHAEL    | WANG      | Silver Card (50000 Limit)    |
+|         104 | ASHLEY     | JONES     | Gold Card (150000 Limit)     |
++-------------+------------+-----------+------------------------------+
+
+mysql> SET @salary = 15000;
+
+mysql> SELECT ALLOCATE_CARD(@salary) AS CARD_TYPE;
++--------------------------+
+| CARD_TYPE                |
++--------------------------+
+| Gold Card (150000 Limit) |
++--------------------------+
+
+
+6. WRITE A QUERY TO GET THE YEARS IN WHICH MORE THAN 10 EMPLOYEES JOINED
+
+mysql> SELECT YEAR(HIRE_DATE) AS YEAR
+     FROM EMPLOYEES
+     GROUP BY YEAR(HIRE_DATE)
+     HAVING COUNT(*) > 10;
+
+
+7. WRITE A QUERY TO DISPLAY THE FIRST WORD FROM THOSE JOB TITLES WHICH CONTAINS MORE THAN ONE WORDS.
+mysql> SELECT SUBSTRING_INDEX(JOB_TITLE, ' ', 1) AS FIRST_WORD
+     FROM JOBS
+     WHERE LOCATE(' ', JOB_TITLE) > 0;
++------------+
+| FIRST_WORD |
++------------+
+| Sales      |
++------------+
+
+ 
+8. WRITE A QUERY TO DISPLAY THE FIRST EIGHT CHARACTERS OF THE EMPLOYEES' FIRST NAMES 
+AND INDICATES THE AMOUNTS OF THEIR SALARIES WITH '$' SIGN. EACH '$' SIGN SIGNIFIES A 
+THOUSAND DOLLARS. SORT THE DATA IN DESCENDING ORDER OF SALARY.
+
+mysql> SELECT LEFT(FIRST_NAME, 8) AS EMPLOYEE_NAME, REPEAT('$', SALARY / 1000) AS SALARY_IN_DOLLARS
+     FROM EMPLOYEES
+     ORDER BY SALARY DESC;
++---------------+---------------------------+
+| EMPLOYEE_NAME | SALARY_IN_DOLLARS         |
++---------------+---------------------------+
+| JANE          | $$$$$$$$$$$$$$$$$$$$$$$$$ |
+| JOHN          | $$$$$$$$$$$$$$$           |
+| ASHLEY        | $$$$$$$$$$$$              |
+| ISMAEL        | $$$$$$$$$                 |
+| MICHAEL       | $$$$$                     |
++---------------+---------------------------+
