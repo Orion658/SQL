@@ -1,0 +1,165 @@
+<<< CREATE YOUR OWN DATABASE >>>
+
+Each question of 2 marks:
+
+
+i. Display the city names in ascending order of population
+
+SELECT city_name
+FROM YourTableName
+ORDER BY population ASC;
+
+
+ii. Display the country names that start with “Z”
+
+SELECT country_name
+FROM YourTableName
+WHERE country_name LIKE 'Z%';
+
+
+iii. Display cities whose population lies between 670000 and 700000;
+
+SELECT city_name
+FROM YourTableName
+WHERE population BETWEEN 670000 AND 700000;
+
+
+iv. Find countries and their capitals whose continent is Antarctica
+
+SELECT country_name, capital
+FROM YourTableName
+WHERE continent = 'Antarctica';
+
+
+v. Update the Head Of State to “Joe Biden” for USA.
+
+UPDATE YourTableName
+SET head_of_state = 'Joe Biden'
+WHERE country_name = 'USA';
+
+
+vi. Display the country codes where the given language is not the country’s official language
+
+SELECT country_code
+FROM YourTableName
+WHERE official_language <> 'YourLanguage';
+
+
+vii. Display the most populated city of India
+
+SELECT city_name
+FROM YourTableName
+WHERE country_name = 'India'
+ORDER BY population DESC
+LIMIT 1;
+
+ ***************** ----------- *******************
+
+Each question of 3 marks:
+
+
+viii. Display the top ten countries with the highest population
+
+SELECT country_name, population
+FROM YourTableName
+ORDER BY population DESC
+LIMIT 10;
+
+
+ix. Display all the country names and country codes that speak English
+
+SELECT country_name, country_code
+FROM YourTableName
+WHERE languages LIKE '%English%';
+
+
+x. Find the city that has the maximum and minimum population
+
+SELECT city_name
+FROM YourTableName
+WHERE population = (SELECT MAX(population) FROM YourTableName)
+   OR population = (SELECT MIN(population) FROM YourTableName);
+
+
+xi. Find the Count of Districts in each Country. Display country name, country code, and Count of Districts as “Number of Districts”
+
+SELECT country_name, country_code, COUNT(DISTINCT district) AS "Number of Districts"
+FROM YourTableName
+GROUP BY country_name, country_code;
+
+
+xii. Find all the countries where Life Expectancy is less than the Average Life Expectancy
+
+SELECT country_name
+FROM YourTableName
+WHERE life_expectancy < (SELECT AVG(life_expectancy) FROM YourTableName);
+
+
+xiii. Display the country name, both the country codes, and the language spoken of all Republican countries
+
+SELECT country_name, country_code, languages
+FROM YourTableName
+WHERE government_form = 'Republic';
+
+************ ----------------- ******************
+
+Each question of 5 marks:
+
+i. Create a Function to accept country code as input and return the Life Expectancy of that country
+
+CREATE FUNCTION GetLifeExpectancy (IN country_code CHAR(3))
+RETURNS DECIMAL(5, 2)
+BEGIN
+   DECLARE life_exp DECIMAL(5, 2);
+   SELECT life_expectancy INTO life_exp
+   FROM YourTableName
+   WHERE country_code = country_code;
+   RETURN life_exp;
+END;
+
+
+ii. Create a Procedure to accept table name as input and display the last 5 rows of that table. HINT: Use Prepared Statement
+
+DELIMITER //
+
+CREATE PROCEDURE DisplayLastRows (IN table_name VARCHAR(255))
+BEGIN
+   SET @query = CONCAT('SELECT * FROM ', table_name, ' ORDER BY column_name DESC LIMIT 5');
+   PREPARE statement FROM @query;
+   EXECUTE statement;
+   DEALLOCATE PREPARE statement;
+END //
+
+DELIMITER ;
+
+
+iii. Create a Procedure and use a Cursor to return a comma-separated list of cities that have names ending with ‘y’
+
+DELIMITER //
+
+CREATE PROCEDURE GetCitiesEndingWithY ()
+BEGIN
+   DECLARE done INT DEFAULT FALSE;
+   DECLARE city_name VARCHAR(255);
+   DECLARE city_cursor CURSOR FOR
+      SELECT city_name
+      FROM YourTableName
+      WHERE city_name LIKE '%y';
+
+   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+   OPEN city_cursor;
+
+   read_loop: LOOP
+      FETCH city_cursor INTO city_name;
+      IF done THEN
+         LEAVE read_loop;
+      END IF;
+
+      SELECT CONCAT(city_name, ', ');
+   END LOOP;
+
+   CLOSE city_cursor;
+END //
+
+DELIMITER ;
