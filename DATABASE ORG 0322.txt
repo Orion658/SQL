@@ -1,0 +1,363 @@
+mysql> CREATE DATABASE ORG;
+
+mysql> USE ORG;
+Database changed
+
+mysql> CREATE TABLE Worker (
+      WORKER_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+      FIRST_NAME CHAR(25),
+      LAST_NAME CHAR(25),
+      SALARY INT(15),
+      JOINING_DATE DATETIME,
+      DEPARTMENT CHAR(25)
+     );
+
+mysql> INSERT INTO Worker
+      (WORKER_ID, FIRST_NAME, LAST_NAME, SALARY, JOINING_DATE, DEPARTMENT) VALUES
+      (001, 'Monika', 'Arora', 100000, '14-02-20 09.00.00', 'HR'),
+      (002, 'Niharika', 'Verma', 80000, '14-06-11 09.00.00', 'Admin'),
+      (003, 'Vishal', 'Singhal', 300000, '14-02-20 09.00.00', 'HR'),
+      (004, 'Amitabh', 'Singh', 500000, '14-02-20 09.00.00', 'Admin'),
+      (005, 'Vivek', 'Bhati', 500000, '14-06-11 09.00.00', 'Admin'),
+      (006, 'Vipul', 'Diwan', 200000, '14-06-11 09.00.00', 'Account'),
+      (007, 'Satish', 'Kumar', 75000, '14-01-20 09.00.00', 'Account'),
+      (008, 'Geetika', 'Chauhan', 90000, '14-04-11 09.00.00', 'Admin');
+
+mysql> CREATE TABLE Bonus (
+      WORKER_REF_ID INT,
+      BONUS_AMOUNT INT(10),
+      BONUS_DATE DATETIME,
+      FOREIGN KEY (WORKER_REF_ID)
+      REFERENCES Worker(WORKER_ID)
+      ON DELETE CASCADE
+     );
+
+mysql> INSERT INTO Bonus
+      (WORKER_REF_ID, BONUS_AMOUNT, BONUS_DATE) VALUES
+      (001, 5000, '16-02-20'),
+      (002, 3000, '16-06-11'),
+      (003, 4000, '16-02-20'),
+      (001, 4500, '16-02-20'),
+      (002, 3500, '16-06-11');
+
+mysql> CREATE TABLE Title (
+      WORKER_REF_ID INT,
+      WORKER_TITLE CHAR(25),
+      AFFECTED_FROM DATETIME,
+      FOREIGN KEY (WORKER_REF_ID)
+      REFERENCES Worker(WORKER_ID)
+      ON DELETE CASCADE
+     );
+
+mysql> INSERT INTO Title
+      (WORKER_REF_ID, WORKER_TITLE, AFFECTED_FROM) VALUES
+      (001, 'Manager', '2016-02-20 00:00:00'),
+      (002, 'Executive', '2016-06-11 00:00:00'),
+      (008, 'Executive', '2016-06-11 00:00:00'),
+      (005, 'Manager', '2016-06-11 00:00:00'),
+      (004, 'Asst. Manager', '2016-06-11 00:00:00'),
+      (007, 'Executive', '2016-06-11 00:00:00'),
+      (006, 'Lead', '2016-06-11 00:00:00'),
+      (003, 'Lead', '2016-06-11 00:00:00');
+
+mysql> show tables;
++---------------+
+| Tables_in_org |
++---------------+
+| bonus         |
+| title         |
+| worker        |
++---------------+
+
+mysql> select * from worker;
++-----------+------------+-----------+--------+---------------------+------------+
+| WORKER_ID | FIRST_NAME | LAST_NAME | SALARY | JOINING_DATE        | DEPARTMENT |
++-----------+------------+-----------+--------+---------------------+------------+
+|         1 | Monika     | Arora     | 100000 | 2014-02-20 09:00:00 | HR         |
+|         2 | Niharika   | Verma     |  80000 | 2014-06-11 09:00:00 | Admin      |
+|         3 | Vishal     | Singhal   | 300000 | 2014-02-20 09:00:00 | HR         |
+|         4 | Amitabh    | Singh     | 500000 | 2014-02-20 09:00:00 | Admin      |
+|         5 | Vivek      | Bhati     | 500000 | 2014-06-11 09:00:00 | Admin      |
+|         6 | Vipul      | Diwan     | 200000 | 2014-06-11 09:00:00 | Account    |
+|         7 | Satish     | Kumar     |  75000 | 2014-01-20 09:00:00 | Account    |
+|         8 | Geetika    | Chauhan   |  90000 | 2014-04-11 09:00:00 | Admin      |
++-----------+------------+-----------+--------+---------------------+------------+
+
+
+--- SECTION 1 ---
+Q1) i) - WRITE AN SQL QUERY TO FETCH FULLNAME , SALARY , JOINING_DATE AND DEPARTMENT FROM WORKER TABLE
+
+mysql> SELECT CONCAT(FIRST_NAME, ' ', LAST_NAME) AS FULL_NAME, SALARY, JOINING_DATE, DEPARTMENT FROM WORKER;
++-----------------+--------+---------------------+------------+
+| FULL_NAME       | SALARY | JOINING_DATE        | DEPARTMENT |
++-----------------+--------+---------------------+------------+
+| Monika Arora    | 100000 | 2014-02-20 09:00:00 | HR         |
+| Niharika Verma  |  80000 | 2014-06-11 09:00:00 | Admin      |
+| Vishal Singhal  | 300000 | 2014-02-20 09:00:00 | HR         |
+| Amitabh Singh   | 500000 | 2014-02-20 09:00:00 | Admin      |
+| Vivek Bhati     | 500000 | 2014-06-11 09:00:00 | Admin      |
+| Vipul Diwan     | 200000 | 2014-06-11 09:00:00 | Account    |
+| Satish Kumar    |  75000 | 2014-01-20 09:00:00 | Account    |
+| Geetika Chauhan |  90000 | 2014-04-11 09:00:00 | Admin      |
++-----------------+--------+---------------------+------------+
+
+
+Q1) ii) - WRITE AN SQL QUERY TO FETCH ID , FULLNAME , SALARY AND DEPARTMENT WHOSE DEPARTMENT IS HR OR ADMIN 
+
+mysql> SELECT WORKER_ID, CONCAT(FIRST_NAME, ' ', LAST_NAME) AS FULL_NAME, SALARY, DEPARTMENT FROM WORKER WHERE DEPARTMENT IN ('HR', 'ADMIN');
++-----------+-----------------+--------+------------+
+| WORKER_ID | FULL_NAME       | SALARY | DEPARTMENT |
++-----------+-----------------+--------+------------+
+|         1 | Monika Arora    | 100000 | HR         |
+|         2 | Niharika Verma  |  80000 | Admin      |
+|         3 | Vishal Singhal  | 300000 | HR         |
+|         4 | Amitabh Singh   | 500000 | Admin      |
+|         5 | Vivek Bhati     | 500000 | Admin      |
+|         8 | Geetika Chauhan |  90000 | Admin      |
++-----------+-----------------+--------+------------+
+
+
+Q1) iii) - WRITE AN SQL QUERY TO FETCH ID , FULLNAME , SALARY WHOSE FIRST_NAME ENDS WITH 'a'
+
+mysql> SELECT WORKER_ID, CONCAT(FIRST_NAME, ' ', LAST_NAME) AS FULL_NAME, SALARY FROM WORKER WHERE FIRST_NAME LIKE '%a';
++-----------+-----------------+--------+
+| WORKER_ID | FULL_NAME       | SALARY |
++-----------+-----------------+--------+
+|         1 | Monika Arora    | 100000 |
+|         2 | Niharika Verma  |  80000 |
+|         8 | Geetika Chauhan |  90000 |
++-----------+-----------------+--------+
+
+
+Q1) iv) - WRITE AN SQL QUERY TO FEACH ALL RECORDS OF WORKER TABLE WHO HAVE JOIN IN FEB 2020
+
+mysql> SELECT * FROM WORKER WHERE JOINING_DATE >= '2014-02-01' AND JOINING_DATE <= '2014-02-28';
++-----------+------------+-----------+--------+---------------------+------------+
+| WORKER_ID | FIRST_NAME | LAST_NAME | SALARY | JOINING_DATE        | DEPARTMENT |
++-----------+------------+-----------+--------+---------------------+------------+
+|         1 | Monika     | Arora     | 100000 | 2014-02-20 09:00:00 | HR         |
+|         3 | Vishal     | Singhal   | 300000 | 2014-02-20 09:00:00 | HR         |
+|         4 | Amitabh    | Singh     | 500000 | 2014-02-20 09:00:00 | Admin      |
++-----------+------------+-----------+--------+---------------------+------------+
+
+
+Q1) v) - WRITE AN SQL QUERY TO FEACH ALL RECORDS OF WORKER TABLE WHO HAVE SALARY >=50000 AND <=100000. 
+
+mysql> SELECT * FROM WORKER WHERE SALARY >= 50000 AND SALARY <= 100000;
++-----------+------------+-----------+--------+---------------------+------------+
+| WORKER_ID | FIRST_NAME | LAST_NAME | SALARY | JOINING_DATE        | DEPARTMENT |
++-----------+------------+-----------+--------+---------------------+------------+
+|         1 | Monika     | Arora     | 100000 | 2014-02-20 09:00:00 | HR         |
+|         2 | Niharika   | Verma     |  80000 | 2014-06-11 09:00:00 | Admin      |
+|         7 | Satish     | Kumar     |  75000 | 2014-01-20 09:00:00 | Account    |
+|         8 | Geetika    | Chauhan   |  90000 | 2014-04-11 09:00:00 | Admin      |
++-----------+------------+-----------+--------+---------------------+------------+
+
+--- SECTION 2 ---
+Q2) i) - WRITE AN SQL QUERY TO DISPLAY NUMBER OF WORKER IN EACH DEPARTMENT ALONG WITH UNIQUE DEPARTMENT NAME 
+
+mysql> SELECT DEPARTMENT, COUNT(*) AS NUM_WORKERS
+     FROM WORKER
+     GROUP BY DEPARTMENT;
++------------+-------------+
+| DEPARTMENT | NUM_WORKERS |
++------------+-------------+
+| HR         |           2 |
+| Admin      |           4 |
+| Account    |           2 |
++------------+-------------+
+
+Q2) ii) - WRITE AN SQL QUERY TO DISPLAY DEPARTMENT NAME AND TOTAL BONUS AMOUNT TO BE PAID IN EACH DEPARTMENT
+
+mysql> SELECT w.DEPARTMENT, SUM(b.BONUS_AMOUNT) AS TOTAL_BONUS
+     FROM worker w
+     JOIN bonus b ON w.WORKER_ID = b.WORKER_REF_ID
+     GROUP BY w.DEPARTMENT;
++------------+-------------+
+| DEPARTMENT | TOTAL_BONUS |
++------------+-------------+
+| HR         |       13500 |
+| Admin      |        6500 |
++------------+-------------+
+
+Q2) iii) - WRITE AN SQL QUERY TO DISPALY THE FULLNAME , SALARY , TOTAL YEARS OF EXPERIANCE OF EACH WORKER
+
+mysql> SELECT CONCAT(FIRST_NAME, ' ', LAST_NAME) AS FULLNAME, SALARY, (YEAR(CURRENT_DATE()) - YEAR(JOINING_DATE)) AS TOTAL_YEARS_EXPERIENCE FROM worker;
++-----------------+--------+------------------------+
+| FULLNAME        | SALARY | TOTAL_YEARS_EXPERIENCE |
++-----------------+--------+------------------------+
+| Monika Arora    | 100000 |                      9 |
+| Niharika Verma  |  80000 |                      9 |
+| Vishal Singhal  | 300000 |                      9 |
+| Amitabh Singh   | 500000 |                      9 |
+| Vivek Bhati     | 500000 |                      9 |
+| Vipul Diwan     | 200000 |                      9 |
+| Satish Kumar    |  75000 |                      9 |
+| Geetika Chauhan |  90000 |                      9 |
++-----------------+--------+------------------------+
+
+Q2) iv) - WRITE AN SQL QUERY TO DISPALY THE DETAILS OF THE WORKER WHO IS MANAGER
+mysql> SELECT w.*
+     FROM worker w
+     JOIN title t ON w.WORKER_ID = t.WORKER_REF_ID
+     WHERE t.WORKER_TITLE = 'Manager';
++-----------+------------+-----------+--------+---------------------+------------+
+| WORKER_ID | FIRST_NAME | LAST_NAME | SALARY | JOINING_DATE        | DEPARTMENT |
++-----------+------------+-----------+--------+---------------------+------------+
+|         1 | Monika     | Arora     | 100000 | 2014-02-20 09:00:00 | HR         |
+|         5 | Vivek      | Bhati     | 500000 | 2014-06-11 09:00:00 | Admin      |
++-----------+------------+-----------+--------+---------------------+------------+
+
+--- SECTION 3 ---
+/// CREATE SAMPLE_DB IN MONGO DATABASE
+
+test> use SAMPLE_DB
+switched to db SAMPLE_DB
+SAMPLE_DB> db.createCollection("MY_COL")
+{ ok: 1 }
+
+SAMPLE_DB> db.MY_COL.insertMany([ { title: "MongoDB Overview", description: "MongoDB is no SQL database", by: "tutorials point", url: "http://www.tutorialspoint.com", tags: ["mongodb", "database", "NoSQL"], likes: 100 }, { title: "NoSQL Database", description: "NoSQLdatabase doesn't have tables", by: "tutorials point", url: "http://www.tutorialspoint.com", tags: ["mongodb", "database", "NoSQL"], likes: 20, comments: [ { user:"user1", message: "My first comment", dateCreated: new Date(2013,11,10,2,35), like: 0}]}])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("65903237461cb4cc1fe9617a"),
+    '1': ObjectId("65903237461cb4cc1fe9617b")
+  }
+}
+
+Q3) i) 1) - SHOW THE DOCUMENTS THAT HAS LIKES GREATER THAN 10
+SAMPLE_DB> db.MY_COL.find({ likes: { $gt: 10 } })
+[
+  {
+    _id: ObjectId("65903237461cb4cc1fe9617a"),
+    title: 'MongoDB Overview',
+    description: 'MongoDB is no SQL database',
+    by: 'tutorials point',
+    url: 'http://www.tutorialspoint.com',
+    tags: [ 'mongodb', 'database', 'NoSQL' ],
+    likes: 100
+  },
+  {
+    _id: ObjectId("65903237461cb4cc1fe9617b"),
+    title: 'NoSQL Database',
+    description: "NoSQLdatabase doesn't have tables",
+    by: 'tutorials point',
+    url: 'http://www.tutorialspoint.com',
+    tags: [ 'mongodb', 'database', 'NoSQL' ],
+    likes: 20,
+    comments: [
+      {
+        user: 'user1',
+        message: 'My first comment',
+        dateCreated: ISODate("2013-12-09T21:05:00.000Z"),
+        like: 0
+      }
+    ]
+  }
+]
+
+Q3) i) 2) - SHOW THE DOCUMENTS THAT HAS USER NAME AS ‘user1’
+
+SAMPLE_DB> db.MY_COL.find({ "comments.user": "user1" })
+[
+  {
+    _id: ObjectId("65903237461cb4cc1fe9617b"),
+    title: 'NoSQL Database',
+    description: "NoSQLdatabase doesn't have tables",
+    by: 'tutorials point',
+    url: 'http://www.tutorialspoint.com',
+    tags: [ 'mongodb', 'database', 'NoSQL' ],
+    likes: 20,
+    comments: [
+      {
+        user: 'user1',
+        message: 'My first comment',
+        dateCreated: ISODate("2013-12-09T21:05:00.000Z"),
+        like: 0
+      }
+    ]
+  }
+]
+
+Q3) ii) - CREATE A FUNCTION IN MYSQL THAT WILL ACCEPT THE ONE INPUT PARAMETER AS WORKER ID AND BASED ON THE ID RETURN THE TOTAL SALARY IN EACH DEPARTMENTS
+
+mysql> DELIMITER &&
+mysql>	CREATE FUNCTION workerFunc(workerId int)
+	RETURNS int
+	READS SQL DATA  
+	BEGIN
+  	DECLARE sumSalary int;
+  	DECLARE deptName varchar(50);
+
+  	SELECT DEPARTMENT INTO deptName FROM worker WHERE WORKER_ID = workerId;
+  	SELECT SUM(SALARY) INTO sumSalary FROM worker WHERE DEPARTMENT = deptName;
+
+  	RETURN sumSalary;
+	END &&
+mysql> DELIMITER ;
+
+mysql> Call workerFunc(6);
+
+
+Q4) -  CREATE A CURSOR IN MYSQL, BY USING THE CURSOR RETURN THE COMMA SEPRATED LIST OF WORKER NAMES 
+
+mysql> DELIMITER &&
+mysql> CREATE PROCEDURE worker_names_cursor()
+     BEGIN
+       DECLARE worker_name VARCHAR(100);
+       DECLARE worker_names_list VARCHAR(1000) DEFAULT '';
+       DECLARE done INT DEFAULT FALSE;
+    
+       DECLARE worker_names_cursor CURSOR FOR
+         SELECT CONCAT(FIRST_NAME, ' ', LAST_NAME) AS FULL_NAME
+         FROM WORKER;
+    
+       DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+       OPEN worker_names_cursor;
+    
+       worker_names_loop: LOOP
+         FETCH worker_names_cursor INTO worker_name;
+         IF done THEN
+           LEAVE worker_names_loop;
+         END IF;
+         SET worker_names_list = CONCAT(worker_names_list, worker_name, ', ');
+       END LOOP;
+    
+       SELECT TRIM(TRAILING ', ' FROM worker_names_list);
+    
+       CLOSE worker_names_cursor;
+     END &&
+
+mysql> DELIMITER ;
+
+mysql> call worker_names_cursor();
++----------------------------------------------------------------------------------------------------------------------+
+| TRIM(TRAILING ', ' FROM worker_names_list)                                                                           |
++----------------------------------------------------------------------------------------------------------------------+
+| Monika Arora, Niharika Verma, Vishal Singhal, Amitabh Singh, Vivek Bhati, Vipul Diwan, Satish Kumar, Geetika Chauhan |
++----------------------------------------------------------------------------------------------------------------------+
+
+Q5) -  CREATE A AFTER INSERT TRIGGER IN MYSQL 
+	CREATE AN EMP_DETAILS TABLES AS FOLLOWS 
+ 	ID , FIRST_NAME , LAST_NAME , DEPARTMENT_ID ,SALARY 
+ 	WHEN AN INSERT HAPPEN INTO THE EMP_DETAILS TABLE INSERT THE FIRST_NAME , LAST_NAME 
+	AND SALARY INTO THE EMP_LOG_DETAILS TABLE
+
+mysql> create table EMP_DETAILS (Id int,First_name varchar(50),last_name varchar(50),department_id int,salary int);
+
+mysql> create table EMP_LOG_DETAILS (First_name varchar(50),last_name varchar(50),salary int);
+
+DELIMITER &&
+CREATE TRIGGER after_emp_details_insert
+AFTER INSERT ON emp_details
+FOR EACH ROW
+BEGIN
+  INSERT INTO emp_log_details VALUES (NEW.FIRST_NAME, NEW.LAST_NAME, NEW.SALARY);
+END &&
+DELIMITER ;
+
+
+
+
+
