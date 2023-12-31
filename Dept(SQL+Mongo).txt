@@ -1,0 +1,202 @@
+Question 1:
+Create table Dept_tb with column Dept_id and Dept having primary key to Dept_id
+and insert following value in it
+
+-- Create the Dept_tb table
+CREATE TABLE Dept_tb (
+    Dept_id INT PRIMARY KEY,
+    Dept VARCHAR(255)
+);
+
+-- Insert values into the Dept_tb table
+INSERT INTO Dept_tb (Dept_id, Dept) VALUES
+     (1, 'Electronics'),
+    (2, 'Civil'),
+    (3, 'Chemical');
+
+
+
+Question 2:
+
+Create table Emp_tb with column Emp_id,name ,city,state,salary,Dept_id having
+primary key to Emp_id and Dept_id must be Foreign Key Insert following value in it
+-- Create the Emp_tb table
+CREATE TABLE Emp_tb (
+    Emp_id INT PRIMARY KEY,
+    Name VARCHAR(255),
+    City VARCHAR(255),
+    State VARCHAR(255),
+    Salary DECIMAL(10, 2),
+    Dept_id INT,
+    FOREIGN KEY (Dept_id) REFERENCES Dept_tb(Dept_id)
+);
+
+-- Insert values into the Emp_tb table
+INSERT INTO Emp_tb (Emp_id, Name, City, State, Salary, Dept_id) VALUES
+    (1, 'Abhishek', 'Mumbai', 'MH', 12000.00, 1),
+    (2, 'Dipak', 'Pune', 'MH', 15000.00, 2),
+    (3, 'Ravi', 'Surat', 'Gujarat', 7000.00, 1),
+    (4, 'Radha', 'Delhi', 'MH', 19000.00, 1),
+    (5, 'Suman', 'Panjim', 'Gao', 14000.00, 3),
+    (6, 'Adhik', 'Satara', 'MH', 10000.00, 2);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+1. List name of employees who is working in Dept "Electronics" ?.(using sub query)
+
+SELECT Name
+FROM Emp_tb
+WHERE Dept_id = (SELECT Dept_id FROM Dept_tb WHERE Dept = 'Electronics');
+
+
+2. Find all the department which have more than and equal 2 Employees.(Use having
+clause)
+
+SELECT Dept, COUNT(*) as EmployeeCount
+FROM Dept_tb
+JOIN Emp_tb ON Dept_tb.Dept_id = Emp_tb.Dept_id
+GROUP BY Dept
+HAVING EmployeeCount >= 2;
+
+
+3. Display the Position at which the string 'dh' occurs in name.
+
+SELECT Name, POSITION('dh' IN Name) AS PositionOfDh
+FROM Emp_tb;
+
+
+4. Change name of column "Salary" to "Sal".
+
+ALTER TABLE Emp_tb
+RENAME COLUMN Salary TO Sal;
+
+
+5.Write query for to increment sal 10% whose dept_id=1,increament sal 20%
+whose dept_id=2 and other 30% .(Use only case)
+
+UPDATE Emp_tb
+SET Sal = 
+    CASE 
+        WHEN Dept_id = 1 THEN Sal * 1.10
+        WHEN Dept_id = 2 THEN Sal * 1.20
+        ELSE Sal * 1.30
+    END;
+
+
+6.Write the current date in the following format: e.g., Sunday, 2nd Mar 2020.
+
+SELECT TO_CHAR(CURRENT_DATE, 'Day, DDth Mon YYYY') AS CurrentDateFormatted;
+
+
+7. List of Employee while names start with 'A' and ends with 'a'.
+
+SELECT *
+FROM Emp_tb
+WHERE Name LIKE 'A%a';
+
+
+8. List all the employee who are located in Mumbai.
+
+SELECT *
+FROM Emp_tb
+WHERE City = 'Mumbai';
+
+
+9. List the Employee Name that start with 'R'.
+
+SELECT Name
+FROM Emp_tb
+WHERE Name LIKE 'R%';
+
+
+10.select all emp whose Dept is other than Electronics and salary is less than
+15000.(use sub query)
+
+SELECT *
+FROM Emp_tb
+WHERE Dept_id <> (SELECT Dept_id FROM Dept_tb WHERE Dept = 'Electronics')
+AND Sal < 15000;
+
+
+//////////////////////////////////////////*********************************************/////////////////////
+
+
+PL/SQL
+Write a stored procedure for addition of digit. e.g 1234=10
+Out put Should be inserted into temp table like (1234,10),(22,4),....
+
+-- Create a temporary table to store the results
+CREATE GLOBAL TEMPORARY TABLE temp_table (
+    original_number NUMBER,
+    digit_sum NUMBER
+) ON COMMIT PRESERVE ROWS;
+
+-- Create a stored procedure for adding digits and inserting into the temp table
+CREATE OR REPLACE PROCEDURE add_digits_and_insert (p_number IN NUMBER) IS
+    v_sum NUMBER := 0;
+    v_temp_number NUMBER := p_number;
+BEGIN
+    -- Calculate the sum of digits
+    WHILE v_temp_number > 0 LOOP
+        v_sum := v_sum + MOD(v_temp_number, 10);
+        v_temp_number := TRUNC(v_temp_number / 10);
+    END LOOP;
+
+    -- Insert into the temp table
+    INSERT INTO temp_table (original_number, digit_sum)
+    VALUES (p_number, v_sum);
+
+    COMMIT; -- Commit the transaction
+END add_digits_and_insert;
+/
+
+******
+Example usage:
+
+-- Call the stored procedure with a number
+BEGIN
+    add_digits_and_insert(1234);
+    add_digits_and_insert(22);
+END;
+/
+
+******
+After executing the procedure, you can query the temp_table to see the results:
+
+-- Query the temp table
+SELECT * FROM temp_table;
+
+
+//////////////////******************MongoDB.********************////////////////////////
+
+MongoDB.
+1. Create the data base called Exam in mongodb.& Create the collection Emps as shown in
+above the diagram
+
+use Exam;
+
+
+2. Insert all the above 6 documents in the Emps collection.
+
+db.Emps.insertMany([
+  { Emp_id: 1, Name: 'Abhishek', City: 'Mumbai', State: 'MH', Salary: 12000.00, Dept_id: 1 },
+  { Emp_id: 2, Name: 'Dipak', City: 'Pune', State: 'MH', Salary: 15000.00, Dept_id: 2 },
+  { Emp_id: 3, Name: 'Ravi', City: 'Surat', State: 'Gujarat', Salary: 7000.00, Dept_id: 1 },
+  { Emp_id: 4, Name: 'Radha', City: 'Delhi', State: 'MH', Salary: 19000.00, Dept_id: 1 },
+  { Emp_id: 5, Name: 'Suman', City: 'Panjim', State: 'Gao', Salary: 14000.00, Dept_id: 3 },
+  { Emp_id: 6, Name: 'Adhik', City: 'Satara', State: 'MH', Salary: 10000.00, Dept_id: 2 }
+]);
+
+
+3. Update the document with State to the Maharashtra whose State name is MH.
+
+db.Emps.updateMany({ State: 'MH' }, { $set: { State: 'Maharashtra' } });
+
+
+4. Delete the document from Emps collection , where Name is Adhik
+
+db.Emps.deleteOne({ Name: 'Adhik' });
+
+
+
