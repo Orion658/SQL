@@ -1,0 +1,46 @@
+/// trigger que
+
+-- Create emp table
+CREATE TABLE emp (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(255),
+    salary DECIMAL(10, 2)
+);
+
+-- Create a table to store salary differences
+CREATE TABLE salary_audit (
+    emp_id INT,
+    old_salary DECIMAL(10, 2),
+    new_salary DECIMAL(10, 2),
+    change_date TIMESTAMP,
+    PRIMARY KEY (emp_id, change_date)
+);
+
+-- Insert trigger
+CREATE TRIGGER emp_insert_trigger
+AFTER INSERT ON emp
+FOR EACH ROW
+BEGIN
+    -- Insert into salary_audit table
+    INSERT INTO salary_audit (emp_id, old_salary, new_salary, change_date)
+    VALUES (NEW.emp_id, NULL, NEW.salary, CURRENT_TIMESTAMP);
+END;
+
+-- Update trigger
+CREATE TRIGGER emp_update_trigger
+AFTER UPDATE ON emp
+FOR EACH ROW
+BEGIN
+    -- Insert into salary_audit table
+    INSERT INTO salary_audit (emp_id, old_salary, new_salary, change_date)
+    VALUES (NEW.emp_id, OLD.salary, NEW.salary, CURRENT_TIMESTAMP);
+END;
+
+-- Delete trigger
+CREATE TRIGGER emp_delete_trigger
+BEFORE DELETE ON emp
+FOR EACH ROW
+BEGIN
+    -- You can add logic here if needed before deletion
+    -- For example, archiving data before deletion
+END;
